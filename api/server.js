@@ -4,9 +4,14 @@ const fs = require("fs");
 const server = express();
 
 //routers
+const oauth_prompt_router = require("../oauthprompt/oauthprompt");
+const oauth_router = require("../oauthprompt/oauth");
 
 server.use(express.json());
 server.use(cors());
+
+server.use("/oauthprompt", oauth_prompt_router);
+server.use("/oauth", oauth_router);
 
 server.get("/", (req, res) => {
   try {

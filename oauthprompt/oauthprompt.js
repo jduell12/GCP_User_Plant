@@ -1,4 +1,4 @@
-require("dotenv").config;
+require("dotenv").config();
 const router = require("express").Router();
 
 const onGoogle = process.env.GOOGLE_CLOUD;
@@ -11,3 +11,5 @@ router.get("/", (req, res) => {
     `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.CLIENT_ID}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile&redirect_uri=${url}`,
   );
 });
+
+module.exports = router;
