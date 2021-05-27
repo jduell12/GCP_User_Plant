@@ -1,6 +1,7 @@
 require("dotenv").config();
 const router = require("express").Router();
 const axios = require("axios");
+const Users = require("../api/users/user_model");
 
 const onGoogle = process.env.GOOGLE_CLOUD;
 const url = onGoogle
@@ -13,17 +14,23 @@ router.get("/", (req, res) => {
     )
     .then((response) => {
       token = response.data.id_token;
+      access_token = response.data.access_token;
       axios
         .get(
           `https://people.googleapis.com/v1/people/me?personFields=names&key=${process.env.API_KEY}`,
           {
             headers: {
-              Authorization: `Bearer ${response.data.access_token}`,
+              Authorization: `Bearer ${access_token}`,
               Accept: "application/json",
             },
           },
         )
         .then((resp) => {
+          // let user_obj = {
+          //   first_name: resp.data.names[0].givenName,
+          //   last_name: resp.data.names[0].familyName,
+          // };
+          // Users.addnewUser().then().catch()
           let html_str = `
             <h1>User Info</h1>
             <ul>
