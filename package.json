@@ -4,7 +4,9 @@
   "description": "Application that allows users to log in via Google to keep track of plants located in a garden with various plot numbers",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env DB_ENV=testing jest --watch --runInBand"
+    "test": "cross-env DB_ENV=testing jest --watch --runInBand",
+    "start": "node index.js",
+    "server": "nodemon index.js"
   },
   "repository": {
     "type": "git",
