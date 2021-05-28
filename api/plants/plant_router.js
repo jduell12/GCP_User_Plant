@@ -44,7 +44,18 @@ router.put(
   "/:plant_id",
   authenticate_jwt,
   helpers.validatePlant,
-  async (req, res) => {},
+  async (req, res) => {
+    const old_plant = await Plants.getPlantById(req.params.plant_id);
+    let plant = {};
+    if (old_plant) {
+      plant = await Plants.editPlant(old_plant, req.body, true);
+    } else {
+      let plantObj = req.body;
+      plantObj.owner_id = req.sub;
+      plant = await Plants.addPlant(req.body);
+    }
+    res.status(200).json(plant);
+  },
 );
 
 router.patch("/:plant_id", authenticate_jwt, async (req, res) => {});
