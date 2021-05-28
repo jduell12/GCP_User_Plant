@@ -1,31 +1,20 @@
-/*
-  Used documentation at https://developers.google.com/identity/sign-in/web/backend-auth
-*/
-
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(process.env.CLIENT_ID);
-
-async function verify(check_token) {
-  const ticket = await client.verifyIdToken({
-    idToken: check_token,
-    audience: process.env.CLIENT_ID,
-  });
-  const payload = ticket.getPayload();
-  const user_id = payload["sub"];
-  return user_id;
-}
 
 module.exports = async (req, res, next) => {
   const token = req.headers.authorization;
   if (token) {
     let token_arr = token.split(" ");
-    await verify(token_arr[1])
-      .then((sub) => {
-        req.sub = sub;
-        req.jwt = token_arr[1];
-      })
-      .catch((err) => {});
+    jwt.verify(token_arr[1], process.env.JWT_SECRET, (err, decodedToken) => {
+      if (err) {
+        res.status(401).json({ message: "Invalid token" });
+      } else {
+        req.jwt = decodedToken;
+        req.sub = decodedToken.subject;
+        next();
+      }
+    });
+  } else {
+    res.status(401).json({ message: "Invalid token" });
   }
-  next();
 };

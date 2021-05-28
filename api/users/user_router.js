@@ -3,6 +3,7 @@ const Users = require("./user_model");
 const helpers = require("./helpers");
 const bcryptjs = require("bcryptjs");
 
+//register a new user and return a jwt token
 router.post("/register", helpers.validateUser, async (req, res) => {
   const user = req.body;
   const rounds = parseInt(process.env.BCRYPT_ROUTS) || 12;
@@ -25,6 +26,7 @@ router.post("/register", helpers.validateUser, async (req, res) => {
     });
 });
 
+//login a previously registered user and return a jwt token
 router.post("/login", helpers.validateLogin, async (req, res) => {
   const { username, password } = req.body;
   Users.getUsersByUsername(username).then((user) => {
@@ -40,6 +42,7 @@ router.post("/login", helpers.validateLogin, async (req, res) => {
   });
 });
 
+//get all users and their unique ids
 router.get("/", async (req, res) => {
   Users.getUsers()
     .then((users) => {
