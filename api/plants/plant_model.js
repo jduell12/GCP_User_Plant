@@ -19,9 +19,13 @@ async function getPlants(owner_id) {
   const [plants] = await datastore.runQuery(query);
   let plant_list = [];
 
-  for (const plant in plants) {
+  for (const plant of plants) {
     if (plant.owner_id === owner_id) {
-      plant_list.push(plant);
+      let plantId = plant[datastore.KEY].id;
+      let plantObj = plant;
+      plantObj.id = plantId;
+      plantObj.self = `${url}/${plantId}`;
+      plant_list.push(plantObj);
     }
   }
   return plant_list;
