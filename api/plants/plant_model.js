@@ -8,8 +8,8 @@ const { Datastore } = require("@google-cloud/datastore");
 const datastore = new Datastore();
 const onGoogle = process.env.GOOGLE_CLOUD;
 let url = onGoogle
-  ? "https://osu-493-portfolio.ue.r.appspot.com/plants"
-  : "http://localhost:5000/plants";
+  ? "https://osu-493-portfolio.ue.r.appspot.com/plants/"
+  : "http://localhost:5000/plants/";
 
 module.exports = {
   getPlants,
@@ -28,7 +28,7 @@ async function getPlants(owner_id) {
       let plantId = plant[datastore.KEY].id;
       let plantObj = plant;
       plantObj.id = plantId;
-      plantObj.self = `${url}/${plantId}`;
+      plantObj.self = url + plantId;
       plant_list.push(plantObj);
     }
   }
@@ -49,7 +49,7 @@ async function addPlant(plantObj) {
     harvestable: plantObj.harvestable,
     water_schedule: plantObj.water_schedule,
     owner_id: plantObj.owner_id,
-    self: `${url}/${plantKey.id}`,
+    self: url + plantKey.id,
     plot_id: plantObj.plot_id,
   };
 }
@@ -85,10 +85,11 @@ async function editPlant(oldPlant, changes, is_put) {
       harvestable: changes.harvestable,
       plot_id: changes.plot_id,
       owner_id: oldPlant.owner_id,
+      self: url + oldPlant[datastore.KEY].id,
     };
   } else {
+    const plant_key = oldPlant[datastore.KEY];
     const new_plant = {
-      key: oldPlant[datastore.KEY],
       name: changes.name ? changes.name : oldPlant.name,
       type: changes.type ? changes.type : oldPlant.type,
       harvestable: changes.harvestable
@@ -98,9 +99,18 @@ async function editPlant(oldPlant, changes, is_put) {
         ? changes.water_schedule
         : oldPlant.water_schedule,
       plot_id: changes.plot_id ? changes.plot_id : oldPlant.plot_id,
+      owner_id: oldPlant.owner_id,
     };
+    //if the user wants to reset a plot number to 0 the above check will always go with the old plot_id since 0 is false
+    if (changes.plot_id === 0) {
+      new_plant.plot_id = 0;
+    }
 
-    await datastore.update(new_plant);
+    const entity = {
+      key: plant_key,
+      data: new_plant,
+    };
+    await datastore.update(entity);
 
     return {
       id: oldPlant.id,
@@ -113,6 +123,7 @@ async function editPlant(oldPlant, changes, is_put) {
         ? changes.water_schedule
         : oldPlant.water_schedule,
       plot_id: changes.plot_id ? changes.plot_id : oldPlant.plot_id,
+      owner_id: oldPlant.owner_id,
       self: url + oldPlant.id,
     };
   }

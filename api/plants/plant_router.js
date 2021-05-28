@@ -45,19 +45,43 @@ router.put(
   authenticate_jwt,
   helpers.validatePlant,
   async (req, res) => {
-    const old_plant = await Plants.getPlantById(req.params.plant_id);
-    let plant = {};
-    if (old_plant) {
-      plant = await Plants.editPlant(old_plant, req.body, true);
-    } else {
-      let plantObj = req.body;
-      plantObj.owner_id = req.sub;
-      plant = await Plants.addPlant(req.body);
+    try {
+      const old_plant = await Plants.getPlantById(req.params.plant_id);
+      let plant = {};
+      if (old_plant) {
+        plant = await Plants.editPlant(old_plant, req.body, true);
+      } else {
+        let plantObj = req.body;
+        plantObj.owner_id = req.sub;
+        plant = await Plants.addPlant(req.body);
+      }
+      res.status(200).json(plant);
+    } catch (e) {
+      res.status(500).json({
+        error: e,
+        errorMessage: "Error with Google Cloud Database",
+        stack: "plant_router line 63",
+      });
     }
-    res.status(200).json(plant);
   },
 );
 
-router.patch("/:plant_id", authenticate_jwt, async (req, res) => {});
+router.patch("/:plant_id", authenticate_jwt, async (req, res) => {
+  try {
+    const old_plant = await Plants.getPlantById(req.params.plant_id);
+    if (old_plant) {
+      const new_plant = await Plants.editPlant(old_plant, req.body, false);
+      res.status(200).json(new_plant);
+    } else {
+      res.status(404).json({ Error: "No plant with this id exists" });
+    }
+  } catch (e) {
+    res.status(500).json({
+      error: e,
+      errorMessage: "Error with Google Cloud Database",
+      stack: "plant_router line 82",
+    });
+  }
+});
 
 module.exports = router;
