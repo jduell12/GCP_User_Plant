@@ -46,5 +46,6 @@ async function addPlant(plantObj) {
     water_schedule: plantObj.water_schedule,
     owner_id: plantObj.owner_id,
     self: `${url}/${plantKey.id}`,
+    plot_id: plantObj.plot_id,
   };
 }

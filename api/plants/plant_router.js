@@ -21,6 +21,7 @@ router.get("/", authenticate_jwt, async (req, res) => {
   }
 });
 
+//add a plant for the user
 router.post("/", authenticate_jwt, helpers.validatePlant, async (req, res) => {
   let plantObj = req.body;
   plantObj.owner_id = req.sub;
@@ -37,5 +38,15 @@ router.post("/", authenticate_jwt, helpers.validatePlant, async (req, res) => {
       });
     });
 });
+
+//edit a plant belonging to the validated user
+router.put(
+  "/:plant_id",
+  authenticate_jwt,
+  helpers.validatePlant,
+  async (req, res) => {},
+);
+
+router.patch("/:plant_id", authenticate_jwt, async (req, res) => {});
 
 module.exports = router;

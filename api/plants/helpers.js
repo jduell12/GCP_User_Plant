@@ -30,6 +30,12 @@ function validatePlant(req, res, next) {
 }
 
 function check_types(plantObj) {
+  if (!plantObj.plot_id) {
+    plantObj.plot_id = 0;
+  } else if (typeof plantObj.plot_id !== "number") {
+    return false;
+  }
+
   if (
     typeof plantObj.name === "string" &&
     typeof plantObj.type === "string" &&
