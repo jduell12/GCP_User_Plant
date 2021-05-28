@@ -22,7 +22,10 @@ async function addnewUser(userObj) {
     data: userObj,
   };
   await datastore.save(entity);
-  return true;
+  return {
+    id: userKey.id,
+    username: userObj.username,
+  };
 }
 
 async function getUsersByUsername(username) {
@@ -31,7 +34,11 @@ async function getUsersByUsername(username) {
 
   for (const user of users) {
     if (user.username === username) {
-      return user;
+      return {
+        id: user[datastore.KEY].id,
+        username: user.username,
+        password: user.password,
+      };
     }
   }
   return;
