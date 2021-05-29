@@ -44,17 +44,50 @@ async function getUsersByUsername(username) {
   return;
 }
 
-async function getUsers() {
-  const query = await datastore.createQuery("User");
+async function getUsers(req) {
+  let query = await datastore.createQuery("User");
   const [users] = await datastore.runQuery(query);
-  let user_list = [];
+  let user_obj = { total_users: users.length };
+  let prev;
+  query = await datastore.createQuery("User").limit(5);
 
-  for (const user of users) {
-    let add_user = {
-      id: user[datastore.KEY].id,
-      username: user.username,
-    };
-    user_list.push(add_user);
+  if (Object.keys(req.query).includes("cursor")) {
+    prev =
+      req.protocol +
+      "://" +
+      req.get("host") +
+      req.baseUrl +
+      "?cursor=" +
+      req.query.cursor;
+    query = query.start(req.query.cursor);
   }
-  return user_list;
+
+  return datastore.runQuery(query).then((res) => {
+    const users = res[0];
+    let user_list = [];
+
+    for (const user of users) {
+      let add_user = {
+        id: user[datastore.KEY].id,
+        username: user.username,
+      };
+      user_list.push(add_user);
+    }
+    user_obj.users = user_list;
+
+    if (typeof prev !== undefined) {
+      user_obj.previous = prev;
+    }
+
+    if (res[1].moreResults !== datastore.NO_MORE_RESULTS) {
+      user_obj.next =
+        req.protocol +
+        "://" +
+        req.get("host") +
+        req.baseUrl +
+        "?cursor=" +
+        res[1].endCursor;
+    }
+    return user_obj;
+  });
 }

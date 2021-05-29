@@ -44,7 +44,7 @@ router.post("/login", helpers.validateLogin, async (req, res) => {
 
 //get all users and their unique ids
 router.get("/", async (req, res) => {
-  Users.getUsers()
+  Users.getUsers(req)
     .then((users) => {
       res.status(200).json(users);
     })

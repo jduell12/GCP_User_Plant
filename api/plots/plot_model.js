@@ -26,8 +26,7 @@ module.exports = {
 async function getPlots(req) {
   let query = await datastore.createQuery("Plot");
   const [plots] = await datastore.runQuery(query);
-  let plot_obj = {};
-  plot_obj.total_plots = plots.length;
+  let plot_obj = { total_plots: plots.length };
   query = await datastore.createQuery("Plot").limit(5);
   let prev;
 
