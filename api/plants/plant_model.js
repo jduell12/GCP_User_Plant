@@ -16,6 +16,7 @@ module.exports = {
   addPlant,
   getPlantById,
   editPlant,
+  deletePlant,
 };
 
 async function getPlants(owner_id) {
@@ -127,4 +128,10 @@ async function editPlant(oldPlant, changes, is_put) {
       self: url + oldPlant.id,
     };
   }
+}
+
+async function deletePlant(oldPlant) {
+  const key = oldPlant[datastore.KEY];
+  await datastore.delete(key);
+  return;
 }

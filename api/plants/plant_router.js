@@ -84,4 +84,28 @@ router.patch("/:plant_id", authenticate_jwt, async (req, res) => {
   }
 });
 
+router.delete("/:plant_id", authenticate_jwt, async (req, res) => {
+  Plants.getPlantById(req.params.plant_id)
+    .then((plant) => {
+      Plants.deletePlant(plant)
+        .then((count) => {
+          res.status(200).json("Successfully deleted plant");
+        })
+        .catch((e) => {
+          res.status(500).json({
+            error: e,
+            errorMessage: "Error with Google Cloud Database",
+            stack: "plant_router line 98",
+          });
+        });
+    })
+    .catch((e) => {
+      res.status(500).json({
+        error: e,
+        errorMessage: "No plant with that id exits",
+        stack: "plant_router line 106",
+      });
+    });
+});
+
 module.exports = router;
