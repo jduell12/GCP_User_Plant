@@ -18,6 +18,8 @@ module.exports = {
   getPlotById,
   editPlot,
   addPlantToPlot,
+  deletePlot,
+  removePlantFromPlot,
 };
 
 async function getPlots() {
@@ -56,7 +58,7 @@ async function addPlot(plot_obj) {
   };
 }
 
-async function getPlotById(plot_id, for_db = false) {
+async function getPlotById(plot_id, for_db = true) {
   const query = await datastore.createQuery("Plot");
   const [plots] = await datastore.runQuery(query);
 
@@ -150,3 +152,19 @@ async function addPlantToPlot(plot_id, plant_id) {
     console.log("plot_model line 148");
   }
 }
+
+async function deletePlot(plot_id) {
+  const plot = await getPlotById(plot_id);
+  if (plot) {
+    if (plot.plant_id) {
+      await Plants.removePlotFromPlant(plot.plant_id, plot_id);
+    }
+    const key = plot[datastore.KEY];
+    await datastore.delete(key);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function removePlantFromPlot(plot_id, plant_id) {}

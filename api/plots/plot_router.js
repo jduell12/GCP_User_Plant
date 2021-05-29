@@ -82,6 +82,19 @@ router.patch(
   },
 );
 
+router.delete("/:plot_id", authenticate_jwt, async (req, res) => {
+  Plots.deletePlot(req.params.plot_id).then((check) => {
+    if (check) {
+      res.status(200).json(`Successfully deleted plot`);
+    } else {
+      res.status(404).json(`No plot with that id exists`);
+    }
+  });
+});
+
+/***************************************************
+ * Plant to Plot relationship endpoints            *
+ ***************************************************/
 //add a plant to a plot
 router.patch(
   "/:plot_id/plants/:plant_id",

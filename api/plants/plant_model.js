@@ -19,6 +19,7 @@ module.exports = {
   deletePlant,
   addPlotToPlant,
   getPlantByPlotId,
+  removePlotFromPlant,
 };
 
 async function getPlants(owner_id) {
@@ -141,7 +142,6 @@ async function deletePlant(oldPlant) {
 async function addPlotToPlant(plant_id, plot_id) {
   try {
     const plant = await getPlantById(plant_id);
-    console.log(plant);
     if (plant) {
       const changes = { plot_id: plot_id };
       const changed_plant = await editPlant(plant, changes, false);
@@ -163,4 +163,18 @@ async function getPlantByPlotId(plot_id) {
     }
   }
   return;
+}
+
+async function removePlotFromPlant(plant_id, plot_id) {
+  try {
+    const plant = await getPlantById(plant_id);
+    if (plant && plant.plot_id === plot_id) {
+      const changes = { plot_id: 0 };
+      const changed_plant = await editPlant(plant, changes, false);
+      return changed_plant;
+    }
+    return false;
+  } catch (e) {
+    console.log("plant_model line 178");
+  }
 }
