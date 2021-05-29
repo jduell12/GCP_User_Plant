@@ -6,8 +6,8 @@ const { Datastore } = require("@google-cloud/datastore");
 const datastore = new Datastore();
 const onGoogle = process.env.GOOGLE_CLOUD;
 let url = onGoogle
-  ? "https://osu-493-portfolio.ue.r.appspot.com/users"
-  : "http://localhost:5000/users";
+  ? "https://osu-493-portfolio.ue.r.appspot.com/users/"
+  : "http://localhost:5000/users/";
 
 module.exports = {
   addnewUser,
@@ -70,6 +70,7 @@ async function getUsers(req) {
       let add_user = {
         id: user[datastore.KEY].id,
         username: user.username,
+        self: url + user[datastore.KEY].id,
       };
       user_list.push(add_user);
     }
