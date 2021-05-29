@@ -6,7 +6,7 @@ const authenticate_jwt = require("../middleware/jwt-auth");
 
 //get all the plots
 router.get("/", async (req, res) => {
-  Plots.getPlots()
+  Plots.getPlots(req)
     .then((plots) => {
       res.status(200).json(plots);
     })

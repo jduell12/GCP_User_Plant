@@ -49,7 +49,7 @@ function checkTypes(plotObj) {
 
 async function checkAvailPlotNumber(plotObj) {
   try {
-    const plot_list = await Plots.getPlots();
+    const plot_list = await Plots.getAllPlots();
     for (const plot of plot_list) {
       if (plot.plot_number === plotObj.plot_number) {
         return false;
@@ -57,11 +57,7 @@ async function checkAvailPlotNumber(plotObj) {
     }
     return true;
   } catch (e) {
-    res.status(500).json({
-      error: e,
-      errorMessage: "Error with google database",
-      stack: "plot helpers line 60",
-    });
+    console.log(e);
   }
 }
 

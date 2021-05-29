@@ -14,6 +14,7 @@ const Plants = require("../plants/plant_model");
 
 module.exports = {
   getPlots,
+  getAllPlots,
   addPlot,
   getPlotById,
   editPlot,
@@ -22,7 +23,57 @@ module.exports = {
   removePlantFromPlot,
 };
 
-async function getPlots() {
+async function getPlots(req) {
+  let query = await datastore.createQuery("Plot");
+  const [plots] = await datastore.runQuery(query);
+  let plot_obj = {};
+  plot_obj.total_plots = plots.length;
+  query = await datastore.createQuery("Plot").limit(5);
+  let prev;
+
+  if (Object.keys(req.query).includes("cursor")) {
+    prev =
+      req.protocol +
+      "://" +
+      req.get("host") +
+      req.baseUrl +
+      "?cursor=" +
+      req.query.cursor;
+    query = query.start(req.query.cursor);
+  }
+
+  return datastore.runQuery(query).then((res) => {
+    const plots = res[0];
+    plot_obj.plots = [];
+    for (const plot of plots) {
+      let add_plot = {
+        id: plot[datastore.KEY].id,
+        plot_number: plot.plot_number,
+        available: plot.available,
+        plant_id: plot.plant_id,
+        sprinkler_system: plot.sprinkler_system,
+        self: url + plot[datastore.KEY].id,
+      };
+      plot_obj.plots.push(add_plot);
+    }
+
+    if (typeof prev !== undefined) {
+      plot_obj.previous = prev;
+    }
+    if (res[1].moreResults !== datastore.NO_MORE_RESULTS) {
+      plot_obj.next =
+        req.protocol +
+        "://" +
+        req.get("host") +
+        req.baseUrl +
+        "?cursor=" +
+        res[1].endCursor;
+    }
+    return plot_obj;
+  });
+}
+
+async function getAllPlots() {
   const query = await datastore.createQuery("Plot");
   const [plots] = await datastore.runQuery(query);
   let plot_list = [];
