@@ -70,7 +70,6 @@ async function getUsers(req) {
       let add_user = {
         id: user[datastore.KEY].id,
         username: user.username,
-        self: url + user[datastore.KEY].id,
       };
       user_list.push(add_user);
     }
