@@ -4,7 +4,7 @@ const helpers = require("./helpers");
 const authenticate_jwt = require("../middleware/jwt-auth");
 
 //get a list of all user plants
-router.get("/", authenticate_jwt, async (req, res) => {
+router.get("/user", authenticate_jwt, async (req, res) => {
   try {
     if (req.jwt) {
       const plants = await Plants.getPlants(req.sub);
@@ -19,6 +19,21 @@ router.get("/", authenticate_jwt, async (req, res) => {
       stack: "plant_router line 19",
     });
   }
+});
+
+//gets a list of all plants
+router.get("/", async (req, res) => {
+  Plants.getAllPlants(req)
+    .then((plants) => {
+      res.status(200).json(plants);
+    })
+    .catch((e) => {
+      res.status(500).json({
+        error: e,
+        errorMessage: "Error with Google database",
+        stack: "plant_router line 34",
+      });
+    });
 });
 
 //add a plant for the user

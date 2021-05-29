@@ -13,6 +13,7 @@ let url = onGoogle
 
 module.exports = {
   getPlants,
+  getAllPlants,
   addPlant,
   getPlantById,
   editPlant,
@@ -36,7 +37,62 @@ async function getPlants(owner_id) {
       plant_list.push(plantObj);
     }
   }
+
   return plant_list;
+}
+
+async function getAllPlants(req) {
+  let query = await datastore.createQuery("Plant");
+  const [plants] = await datastore.runQuery(query);
+  let plant_obj = { total_plants: plants.length };
+  let prev;
+  query = await datastore.createQuery("Plant").limit(5);
+
+  if (Object.keys(req.query).includes("cursor")) {
+    prev =
+      req.protocol +
+      "://" +
+      req.get("host") +
+      req.baseUrl +
+      "?cursor=" +
+      req.query.cursor;
+    query = query.start(req.query.cursor);
+  }
+
+  return datastore.runQuery(query).then((res) => {
+    const plants = res[0];
+    let plant_list = [];
+
+    for (const plant of plants) {
+      let add_plant = {
+        id: plant[datastore.KEY],
+        name: plant.name,
+        type: plant.type,
+        harvestable: plant.harvestable,
+        water_schedule: plant.water_schedule,
+        owner_id: plant.owner_id,
+        self: url + plant[datastore.KEY],
+        plot_id: plant.plot_id,
+      };
+      plant_list.push(add_plant);
+    }
+    plant_obj.plants = plant_list;
+
+    if (typeof prev !== undefined) {
+      plant_obj.previous = prev;
+    }
+
+    if (res[1].moreResults !== datastore.NO_MORE_RESULTS) {
+      plant_obj.next =
+        req.protocol +
+        "://" +
+        req.get("host") +
+        req.baseUrl +
+        "?cursor=" +
+        res[1].endCursor;
+    }
+    return plant_obj;
+  });
 }
 
 async function addPlant(plantObj) {
