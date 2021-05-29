@@ -123,4 +123,27 @@ router.patch(
   },
 );
 
+//remove plant from a plot
+router.delete(
+  "/:plot_id/plants/:plant_id",
+  authenticate_jwt,
+  async (req, res) => {
+    Plots.removePlantFromPlot(req.params.plot_id, req.params.plant_id)
+      .then((check) => {
+        if (check) {
+          res.status(200).json("Successfully removed plant from plot");
+        } else {
+          res.status(500).json("Could not remove plot from plant");
+        }
+      })
+      .catch((e) => {
+        res.status(500).json({
+          error: e,
+          errorMessage: "Error with Google database",
+          stack: "plot_router line 138",
+        });
+      });
+  },
+);
+
 module.exports = router;

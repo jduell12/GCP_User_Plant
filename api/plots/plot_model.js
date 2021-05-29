@@ -141,13 +141,17 @@ async function addPlantToPlot(plot_id, plant_id) {
     const plot = await getPlotById(plot_id, true);
     if (plot) {
       const changes = { plant_id: plant_id, available: false };
-      const changed_plot = await editPlot(plot, changes, false);
       const changed_plant = await Plants.addPlotToPlant(plant_id, plot_id);
-      if (changed_plot && changed_plant) {
-        return true;
+      if (changed_plant) {
+        const changed_plot = await editPlot(plot, changes, false);
+        if (changed_plot) {
+          return true;
+        }
       }
+      return false;
+    } else {
+      return false;
     }
-    return false;
   } catch (e) {
     console.log("plot_model line 148");
   }
@@ -167,4 +171,20 @@ async function deletePlot(plot_id) {
   }
 }
 
-async function removePlantFromPlot(plot_id, plant_id) {}
+async function removePlantFromPlot(plot_id, plant_id) {
+  const plot = await getPlotById(plot_id);
+  if (plot.plant_id === plant_id) {
+    const plant = await Plants.removePlotFromPlant(plant_id, plot_id);
+    if (plant) {
+      const changes = {
+        plant_id: 0,
+        available: true,
+      };
+      const changed_plot = await editPlot(plot, changes, false);
+      if (changed_plot) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

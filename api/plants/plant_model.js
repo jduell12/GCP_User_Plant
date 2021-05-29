@@ -146,8 +146,9 @@ async function addPlotToPlant(plant_id, plot_id) {
       const changes = { plot_id: plot_id };
       const changed_plant = await editPlant(plant, changes, false);
       return changed_plant;
+    } else {
+      return false;
     }
-    return false;
   } catch (e) {
     console.log("plant_model line 150");
   }
