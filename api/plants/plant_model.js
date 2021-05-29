@@ -17,6 +17,8 @@ module.exports = {
   getPlantById,
   editPlant,
   deletePlant,
+  addPlotToPlant,
+  getPlantByPlotId,
 };
 
 async function getPlants(owner_id) {
@@ -133,5 +135,32 @@ async function editPlant(oldPlant, changes, is_put) {
 async function deletePlant(oldPlant) {
   const key = oldPlant[datastore.KEY];
   await datastore.delete(key);
+  return;
+}
+
+async function addPlotToPlant(plant_id, plot_id) {
+  try {
+    const plant = await getPlantById(plant_id);
+    console.log(plant);
+    if (plant) {
+      const changes = { plot_id: plot_id };
+      const changed_plant = await editPlant(plant, changes, false);
+      return changed_plant;
+    }
+    return false;
+  } catch (e) {
+    console.log("plant_model line 150");
+  }
+}
+
+async function getPlantByPlotId(plot_id) {
+  const query = await datastore.createQuery("Plot");
+  const [plants] = await datastore.runQuery(query);
+
+  for (const plant of plants) {
+    if (plant.plot_id === plot_id) {
+      return plant;
+    }
+  }
   return;
 }

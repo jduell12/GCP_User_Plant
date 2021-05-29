@@ -10,12 +10,14 @@ const onGoogle = process.env.GOOGLE_CLOUD;
 let url = onGoogle
   ? "https://osu-493-portfolio.ue.r.appspot.com/plots/"
   : "http://localhost:5000/plots/";
+const Plants = require("../plants/plant_model");
 
 module.exports = {
   getPlots,
   addPlot,
   getPlotById,
   editPlot,
+  addPlantToPlot,
 };
 
 async function getPlots() {
@@ -54,13 +56,23 @@ async function addPlot(plot_obj) {
   };
 }
 
-async function getPlotById(plot_id) {
+async function getPlotById(plot_id, for_db = false) {
   const query = await datastore.createQuery("Plot");
   const [plots] = await datastore.runQuery(query);
 
   for (const plot of plots) {
     if (plot[datastore.KEY].id === plot_id) {
-      return plot;
+      if (for_db) {
+        return plot;
+      }
+      return {
+        id: plot_id,
+        available: plot.available,
+        plot_number: plot.plot_number,
+        plant_id: plot.plant_id,
+        sprinkler_system: plot.sprinkler_system,
+        self: url + plot_id,
+      };
     }
   }
   return false;
@@ -88,10 +100,14 @@ async function editPlot(old_plot, changes, is_put) {
       plot_number: changes.plot_number
         ? changes.plot_number
         : old_plot.plot_number,
-      plant_id: old_plot.plant_id,
+      plant_id: changes.plant_id ? changes.plant_id : old_plot.plant_id,
     };
+
     if (changes.plot_number === 0) {
       new_plot.plot_number = 0;
+    }
+    if (changes.plant_id === 0) {
+      new_plot.plant_id = 0;
     }
     if (changes.available || changes.available === false) {
       new_plot.available = changes.available;
@@ -115,5 +131,22 @@ async function editPlot(old_plot, changes, is_put) {
     new_plot.self = url + plot_key.id;
 
     return new_plot;
+  }
+}
+
+async function addPlantToPlot(plot_id, plant_id) {
+  try {
+    const plot = await getPlotById(plot_id, true);
+    if (plot) {
+      const changes = { plant_id: plant_id, available: false };
+      const changed_plot = await editPlot(plot, changes, false);
+      const changed_plant = await Plants.addPlotToPlant(plant_id, plot_id);
+      if (changed_plot && changed_plant) {
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    console.log("plot_model line 148");
   }
 }

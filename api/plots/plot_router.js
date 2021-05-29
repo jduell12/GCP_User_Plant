@@ -34,7 +34,7 @@ router.post("/", helpers.validatePlot, async (req, res) => {
     });
 });
 
-//edit plots
+//edit plot attributes
 router.put(
   "/:plot_id",
   authenticate_jwt,
@@ -82,13 +82,31 @@ router.patch(
   },
 );
 
-//adds a plant to a plot
+//add a plant to a plot
 router.patch(
   "/:plot_id/plants/:plant_id",
   authenticate_jwt,
-  helpers.checkPatchTypes,
+  helpers.checkPlotAvail,
   async (req, res) => {
-    res.status(200).json({});
+    Plots.addPlantToPlot(req.params.plot_id, req.params.plant_id)
+      .then(async (check) => {
+        if (check) {
+          const plot = await Plots.getPlotById(req.params.plot_id, false);
+          res.status(200).json(plot);
+        } else {
+          res.status(404).json({
+            Error:
+              "The plot and/or the plant do not exist with the provided ids",
+          });
+        }
+      })
+      .catch((e) => {
+        res.status(500).json({
+          error: e,
+          errorMessage: "Error with Google database",
+          stack: "plot_router line 106",
+        });
+      });
   },
 );
 

@@ -4,6 +4,7 @@ module.exports = {
   validatePlot,
   validateEditPlot,
   checkPatchTypes,
+  checkPlotAvail,
 };
 
 async function validatePlot(req, res, next) {
@@ -121,5 +122,22 @@ function checkPatchTypes(req, res, next) {
     res.status(400).json({
       Error: "Please enter a valid attribute or valid attribute type",
     });
+  }
+}
+
+async function checkPlotAvail(req, res, next) {
+  const plot_id = req.params.plot_id;
+  const plot = await Plots.getPlotById(plot_id);
+
+  if (plot) {
+    if (plot.available) {
+      next();
+    } else {
+      res
+        .status(400)
+        .json({ Error: "The plot with the given id is not available" });
+    }
+  } else {
+    res.status(404).json({ Error: "No plot with that id exists" });
   }
 }
