@@ -104,7 +104,7 @@ router.delete("/:plant_id", authenticate_jwt, async (req, res) => {
     .then((plant) => {
       Plants.deletePlant(plant)
         .then((count) => {
-          res.status(200).json("Successfully deleted plant");
+          res.status(204).end();
         })
         .catch((e) => {
           res.status(500).json({

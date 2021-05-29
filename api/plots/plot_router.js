@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const Plots = require("./plot_model");
-const Plants = require("../plants/plant_model");
 const helpers = require("./helpers");
 const authenticate_jwt = require("../middleware/jwt-auth");
 
@@ -85,7 +84,7 @@ router.patch(
 router.delete("/:plot_id", authenticate_jwt, async (req, res) => {
   Plots.deletePlot(req.params.plot_id).then((check) => {
     if (check) {
-      res.status(200).json(`Successfully deleted plot`);
+      res.status(204).end();
     } else {
       res.status(404).json(`No plot with that id exists`);
     }

@@ -26,8 +26,8 @@ async function validatePlot(req, res, next) {
           "The request object attributes have one or more of the wrong type",
       });
     } else {
-      res.status(400).json({
-        Error: "Please enter a plot number that is not taken",
+      res.status(403).json({
+        Error: "Please enter a valid and empty plot number",
       });
     }
   } else {

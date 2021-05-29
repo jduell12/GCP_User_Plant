@@ -26,7 +26,7 @@ function checkHeaderType(req, res, next) {
   if (req.headers["content-type"] === "application/json") {
     next();
   } else {
-    res.status(415).json({ Error: "Request header should accept JSON object" });
+    res.status(406).json({ Error: "Request header should accept JSON object" });
   }
 }
 

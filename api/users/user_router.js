@@ -57,4 +57,16 @@ router.get("/", async (req, res) => {
     });
 });
 
+router.put("/", (req, res) => {
+  res
+    .status(405)
+    .json({ Error: "Can't perform a PUT request on the base user url." });
+});
+
+router.delete("/", (req, res) => {
+  res
+    .status(405)
+    .json({ Error: "Can't perform a DELETE request on the base user url." });
+});
+
 module.exports = router;
