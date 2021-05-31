@@ -77,13 +77,21 @@ router.delete(
   helpers.checkPlotAvail,
   helpers.checkPlotHasPlant,
   async (req, res) => {
-    Plots.deletePlot(req.params.plot_id).then((check) => {
-      if (check) {
-        res.status(204).end();
-      } else {
-        res.status(404).json("No plot with that id exists");
-      }
-    });
+    Plots.deletePlot(req.params.plot_id)
+      .then((check) => {
+        if (check) {
+          res.status(204).end();
+        } else {
+          res.status(404).json("No plot with that id exists");
+        }
+      })
+      .catch((e) => {
+        res.status(500).json({
+          error: e,
+          errorMessage: "Something went wrong with google cloud",
+          stack: "plot_router line 92",
+        });
+      });
   },
 );
 
