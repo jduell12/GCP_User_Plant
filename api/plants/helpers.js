@@ -11,7 +11,7 @@ function validatePlant(req, res, next) {
   if (
     plantObj.name &&
     plantObj.type &&
-    plantObj.harvestable &&
+    (plantObj.harvestable || plantObj.harvestable === false) &&
     plantObj.water_schedule
   ) {
     if (check_types(plantObj)) {

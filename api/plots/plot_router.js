@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
 router.post("/", helpers.validatePlot, async (req, res) => {
   Plots.addPlot(req.body)
     .then((plot) => {
-      res.status(200).json(plot);
+      res.status(201).json(plot);
     })
     .catch((e) => {
       res.status(500).json({
@@ -99,6 +99,7 @@ router.patch(
   "/:plot_id/plants/:plant_id",
   authenticate_jwt,
   helpers.checkPlotAvail,
+  helpers.checkPlantBelongstoUser,
   async (req, res) => {
     Plots.addPlantToPlot(req.params.plot_id, req.params.plant_id)
       .then(async (check) => {
@@ -106,9 +107,9 @@ router.patch(
           const plot = await Plots.getPlotById(req.params.plot_id, false);
           res.status(200).json(plot);
         } else {
-          res.status(404).json({
-            Error:
-              "The plot and/or the plant do not exist with the provided ids",
+          res.status(500).json({
+            Error: "Could not add the plant to the plot",
+            stack: "plot_router line 112",
           });
         }
       })
@@ -126,6 +127,7 @@ router.patch(
 router.delete(
   "/:plot_id/plants/:plant_id",
   authenticate_jwt,
+  helpers.checkPlantBelongstoUser,
   async (req, res) => {
     Plots.removePlantFromPlot(req.params.plot_id, req.params.plant_id)
       .then((check) => {

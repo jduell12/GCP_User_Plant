@@ -63,14 +63,22 @@ router.put(
     try {
       const old_plant = await Plants.getPlantById(req.params.plant_id);
       let plant = {};
-      if (old_plant) {
-        plant = await Plants.editPlant(old_plant, req.body, true);
+      if (old_plant.owner_id === req.sub) {
+        if (old_plant) {
+          plant = await Plants.editPlant(old_plant, req.body, true);
+        } else {
+          let plantObj = req.body;
+          plantObj.owner_id = req.sub;
+          plant = await Plants.addPlant(req.body);
+        }
+        res.status(200).json(plant);
       } else {
-        let plantObj = req.body;
-        plantObj.owner_id = req.sub;
-        plant = await Plants.addPlant(req.body);
+        res.status(401).json({
+          Error:
+            "The plant id provided is not a plant of the owner. Please verify the plant id.",
+          stack: "plant_router line 179",
+        });
       }
-      res.status(200).json(plant);
     } catch (e) {
       res.status(500).json({
         error: e,
@@ -85,8 +93,16 @@ router.patch("/:plant_id", authenticate_jwt, async (req, res) => {
   try {
     const old_plant = await Plants.getPlantById(req.params.plant_id);
     if (old_plant) {
-      const new_plant = await Plants.editPlant(old_plant, req.body, false);
-      res.status(200).json(new_plant);
+      if (old_plant.owner_id === req.sub) {
+        const new_plant = await Plants.editPlant(old_plant, req.body, false);
+        res.status(200).json(new_plant);
+      } else {
+        res.status(401).json({
+          Error:
+            "The plant id provided is not a plant of the owner. Please verify the plant id.",
+          stack: "plant_router line 103",
+        });
+      }
     } else {
       res.status(404).json({ Error: "No plant with this id exists" });
     }
@@ -94,7 +110,7 @@ router.patch("/:plant_id", authenticate_jwt, async (req, res) => {
     res.status(500).json({
       error: e,
       errorMessage: "Error with Google Cloud Database",
-      stack: "plant_router line 82",
+      stack: "plant_router line 113",
     });
   }
 });
@@ -102,23 +118,31 @@ router.patch("/:plant_id", authenticate_jwt, async (req, res) => {
 router.delete("/:plant_id", authenticate_jwt, async (req, res) => {
   Plants.getPlantById(req.params.plant_id)
     .then((plant) => {
-      Plants.deletePlant(plant)
-        .then((count) => {
-          res.status(204).end();
-        })
-        .catch((e) => {
-          res.status(500).json({
-            error: e,
-            errorMessage: "Error with Google Cloud Database",
-            stack: "plant_router line 98",
+      if (plant.owner_id === req.sub) {
+        Plants.deletePlant(plant)
+          .then((count) => {
+            res.status(204).end();
+          })
+          .catch((e) => {
+            res.status(500).json({
+              error: e,
+              errorMessage: "Error with Google Cloud Database",
+              stack: "plant_router line 130",
+            });
           });
+      } else {
+        res.status(401).json({
+          Error:
+            "The plant id provided is not a plant of the owner. Please verify the plant id.",
+          stack: "plant_router line 137",
         });
+      }
     })
     .catch((e) => {
       res.status(500).json({
         error: e,
         errorMessage: "No plant with that id exits",
-        stack: "plant_router line 106",
+        stack: "plant_router line 145",
       });
     });
 });

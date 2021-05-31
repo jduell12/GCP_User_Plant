@@ -1,10 +1,12 @@
 const Plots = require("./plot_model");
+const Plants = require("../plants/plant_model");
 
 module.exports = {
   validatePlot,
   validateEditPlot,
   checkPatchTypes,
   checkPlotAvail,
+  checkPlantBelongstoUser,
 };
 
 async function validatePlot(req, res, next) {
@@ -135,5 +137,26 @@ async function checkPlotAvail(req, res, next) {
     }
   } else {
     res.status(404).json({ Error: "No plot with that id exists" });
+  }
+}
+
+async function checkPlantBelongstoUser(req, res, next) {
+  const plant_id = req.params.plant_id;
+  const plant = await Plants.getPlantById(plant_id);
+  if (plant && plant.owner_id === req.sub) {
+    next();
+  } else {
+    if (!plant) {
+      res.status(404).json({
+        Error: "No plant with that id exists",
+        stack: "plot helpers line 153",
+      });
+    } else {
+      res.status(401).json({
+        Error:
+          "The plant id provided is not a plant of the owner. Please verify the plant id.",
+        stack: "plot helper line 158",
+      });
+    }
   }
 }
