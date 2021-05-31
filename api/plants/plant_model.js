@@ -84,13 +84,7 @@ async function getAllPlants(req) {
     }
 
     if (res[1].moreResults !== datastore.NO_MORE_RESULTS) {
-      plant_obj.next =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        req.baseUrl +
-        "?cursor=" +
-        res[1].endCursor;
+      plant_obj.next = url + "?cursor=" + res[1].endCursor;
     }
     return plant_obj;
   });
