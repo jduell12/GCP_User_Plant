@@ -14,7 +14,7 @@ server.use(cors());
 
 server.use("/oauthprompt", oauth_prompt_router);
 server.use("/oauth", oauth_router);
-server.use("/users", checkHeaderType, user_router);
+server.use("/users", user_router);
 server.use("/plants", checkHeaderType, plant_router);
 server.use("/plots", checkHeaderType, plot_router);
 
