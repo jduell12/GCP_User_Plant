@@ -49,7 +49,7 @@ router.post("/", authenticate_jwt, helpers.validatePlant, async (req, res) => {
       res.status(500).json({
         error: e,
         errorMessage: "Something went wrong with google cloud",
-        stack: "plant_router line 34",
+        stack: "plant_router line 52",
       });
     });
 });
@@ -76,14 +76,14 @@ router.put(
         res.status(401).json({
           Error:
             "The plant id provided is not a plant of the owner. Please verify the plant id.",
-          stack: "plant_router line 179",
+          stack: "plant_router line 79",
         });
       }
     } catch (e) {
       res.status(500).json({
         error: e,
         errorMessage: "Error with Google Cloud Database",
-        stack: "plant_router line 63",
+        stack: "plant_router line 86",
       });
     }
   },
@@ -141,7 +141,7 @@ router.delete("/:plant_id", authenticate_jwt, async (req, res) => {
     .catch((e) => {
       res.status(500).json({
         error: e,
-        errorMessage: "No plant with that id exits",
+        errorMessage: "No plant with that id exists",
         stack: "plant_router line 145",
       });
     });

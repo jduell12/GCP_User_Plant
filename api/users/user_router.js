@@ -21,7 +21,7 @@ router.post("/register", helpers.validateUser, async (req, res) => {
       res.status(500).json({
         error: e,
         errorMessage: "Something went wrong with Google Cloud Database",
-        stack: "user_router line 23",
+        stack: "user_router line 24",
       });
     });
 });
@@ -52,7 +52,7 @@ router.get("/", async (req, res) => {
       res.status(500).json({
         error: e.message,
         errorMessage: "Error with Google Cloud Database",
-        stack: "user_router line 78",
+        stack: "user_router line 55",
       });
     });
 });

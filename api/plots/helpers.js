@@ -7,6 +7,7 @@ module.exports = {
   checkPatchTypes,
   checkPlotAvail,
   checkPlantBelongstoUser,
+  checkPlotHasPlant,
 };
 
 async function validatePlot(req, res, next) {
@@ -60,6 +61,7 @@ async function checkAvailPlotNumber(plotObj) {
     return true;
   } catch (e) {
     console.log(e);
+    return false;
   }
 }
 
@@ -79,13 +81,13 @@ async function validateEditPlot(req, res, next) {
     } else {
       res.status(400).json({
         Error: "The request attributes have one or more of the wrong type",
-        stack: "plot helpers line 82",
+        stack: "plot helpers line 84",
       });
     }
   } else {
     res.status(400).json({
       Error: "The request object is missing required attributes",
-      stack: "plot helpers line 88",
+      stack: "plot helpers line 90",
     });
   }
 }
@@ -149,14 +151,25 @@ async function checkPlantBelongstoUser(req, res, next) {
     if (!plant) {
       res.status(404).json({
         Error: "No plant with that id exists",
-        stack: "plot helpers line 153",
+        stack: "plot helpers line 154",
       });
     } else {
       res.status(401).json({
         Error:
           "The plant id provided is not a plant of the owner. Please verify the plant id.",
-        stack: "plot helper line 158",
+        stack: "plot helper line 160",
       });
     }
+  }
+}
+
+async function checkPlotHasPlant(req, res, next) {
+  const plot = await Plots.getPlotById(req.params.plot_id);
+  if (plot.plant_id === 0) {
+    next();
+  } else {
+    res.status(401).json({
+      Error: "To remove a plot that has a plant please use the correct URL",
+    });
   }
 }

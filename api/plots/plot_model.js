@@ -198,6 +198,7 @@ async function addPlantToPlot(plot_id, plant_id) {
     return false;
   } catch (e) {
     console.log("plot_model line 148");
+    return false;
   }
 }
 
@@ -215,17 +216,28 @@ async function deletePlot(plot_id) {
   }
 }
 
-async function removePlantFromPlot(plot_id) {
+async function removePlantFromPlot(plot_id, plant_id = undefined) {
   const plot = await getPlotById(plot_id);
-
-  const changes = {
-    plant_id: 0,
-    available: true,
-  };
-  const changed_plot = await editPlot(plot, changes, false);
-  if (changed_plot) {
-    return true;
+  if (plant_id !== undefined) {
+    if (plot.plant_id === plant_id) {
+      const changes = {
+        plant_id: 0,
+        available: true,
+      };
+      const changed_plot = await editPlot(plot, changes, false);
+      if (changed_plot) {
+        return true;
+      }
+    }
+  } else {
+    const changes = {
+      plant_id: 0,
+      available: true,
+    };
+    const changed_plot = await editPlot(plot, changes, false);
+    if (changed_plot) {
+      return true;
+    }
   }
-
   return false;
 }

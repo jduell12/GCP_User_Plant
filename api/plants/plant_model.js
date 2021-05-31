@@ -192,9 +192,9 @@ async function editPlant(oldPlant, changes, is_put) {
 
 async function deletePlant(oldPlant) {
   const key = oldPlant[datastore.KEY];
-  // const plant_id = key.id;
-  // const plot_id = oldPlant.plot_id;
-  // await Plots.removePlantFromPlot(plot_id, plant_id);
+  const plant_id = key.id;
+  const plot_id = oldPlant.plot_id;
+  await Plots.removePlantFromPlot(plot_id, plant_id);
   await datastore.delete(key);
   return;
 }
@@ -211,6 +211,7 @@ async function addPlotToPlant(plant_id, plot_id) {
     }
   } catch (e) {
     console.log("plant_model line 150");
+    return false;
   }
 }
 
@@ -237,5 +238,6 @@ async function removePlotFromPlant(plant_id, plot_id) {
     return false;
   } catch (e) {
     console.log("plant_model line 178");
+    return false;
   }
 }

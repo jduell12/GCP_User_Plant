@@ -45,7 +45,7 @@ router.get("/", (req, res) => {
           res.status(500).json({
             message: "could not get token",
             err: err,
-            stack: "/oauth line 41",
+            stack: "/oauth line 48",
           });
         });
     })
@@ -53,7 +53,7 @@ router.get("/", (req, res) => {
       res.status(500).json({
         message: "could not get token",
         error: err,
-        stack: "/oauth line 49",
+        stack: "/oauth line 56",
       });
     });
 });
