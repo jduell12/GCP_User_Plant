@@ -10,7 +10,6 @@ const onGoogle = process.env.GOOGLE_CLOUD;
 let url = onGoogle
   ? "https://osu-493-portfolio.ue.r.appspot.com/plots/"
   : "http://localhost:5000/plots/";
-const Plants = require("../plants/plant_model");
 
 module.exports = {
   getPlots,
@@ -191,17 +190,12 @@ async function addPlantToPlot(plot_id, plant_id) {
     const plot = await getPlotById(plot_id, true);
     if (plot) {
       const changes = { plant_id: plant_id, available: false };
-      const changed_plant = await Plants.addPlotToPlant(plant_id, plot_id);
-      if (changed_plant) {
-        const changed_plot = await editPlot(plot, changes, false);
-        if (changed_plot) {
-          return true;
-        }
+      const changed_plot = await editPlot(plot, changes, false);
+      if (changed_plot) {
+        return true;
       }
-      return false;
-    } else {
-      return false;
     }
+    return false;
   } catch (e) {
     console.log("plot_model line 148");
   }
@@ -221,20 +215,17 @@ async function deletePlot(plot_id) {
   }
 }
 
-async function removePlantFromPlot(plot_id, plant_id) {
+async function removePlantFromPlot(plot_id) {
   const plot = await getPlotById(plot_id);
-  if (plot.plant_id === plant_id) {
-    const plant = await Plants.removePlotFromPlant(plant_id, plot_id);
-    if (plant) {
-      const changes = {
-        plant_id: 0,
-        available: true,
-      };
-      const changed_plot = await editPlot(plot, changes, false);
-      if (changed_plot) {
-        return true;
-      }
-    }
+
+  const changes = {
+    plant_id: 0,
+    available: true,
+  };
+  const changed_plot = await editPlot(plot, changes, false);
+  if (changed_plot) {
+    return true;
   }
+
   return false;
 }

@@ -7,6 +7,7 @@
 const { Datastore } = require("@google-cloud/datastore");
 const datastore = new Datastore();
 const onGoogle = process.env.GOOGLE_CLOUD;
+const Plots = require("../plots/plot_model");
 let url = onGoogle
   ? "https://osu-493-portfolio.ue.r.appspot.com/plants/"
   : "http://localhost:5000/plants/";
@@ -18,9 +19,9 @@ module.exports = {
   getPlantById,
   editPlant,
   deletePlant,
-  addPlotToPlant,
   getPlantByPlotId,
   removePlotFromPlant,
+  addPlotToPlant,
 };
 
 async function getPlants(owner_id) {
@@ -191,6 +192,9 @@ async function editPlant(oldPlant, changes, is_put) {
 
 async function deletePlant(oldPlant) {
   const key = oldPlant[datastore.KEY];
+  // const plant_id = key.id;
+  // const plot_id = oldPlant.plot_id;
+  // await Plots.removePlantFromPlot(plot_id, plant_id);
   await datastore.delete(key);
   return;
 }
